@@ -3,11 +3,12 @@ resource "random_id" "suffix" {
 }
 
 resource "aws_s3_bucket" "microservice_chat_bot" {
-  bucket = "microservice-chat-bot-${random_id.suffix.hex}"
+  bucket = "${var.environment}-microservice-chat-bot-${random_id.suffix.hex}"
 
   tags = {
     Name        = "demo bucket"
-    Environment = "dev"
+    Environment = "${var.environment}"
+    description = "S3 Bucket for website hosting"
   }
 }
 
@@ -32,22 +33,28 @@ resource "aws_s3_bucket_website_configuration" "microservice_chat_bot_hosting_co
   }
 }
 
-//bucket policy 
-resource "aws_s3_bucket_policy" "my_bucket_policy" {
+resource "aws_s3_bucket_policy" "bucket_policy_microservice_chat_bot" {
   bucket = aws_s3_bucket.microservice_chat_bot.id
 
   policy = jsonencode({
-    Version = "2012-10-17",
+    Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow",
-        Principal = "*",
+        Sid    = "AllowCloudFrontServicePrincipalReadWrite"
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudfront.amazonaws.com"
+        }
         Action = [
-          "s3:GetObject"
-        ],
-        Resource = [
-          "${aws_s3_bucket.microservice_chat_bot.arn}/*"
+          "s3:GetObject",
+          "s3:PutObject"
         ]
+        Resource = "${aws_s3_bucket.microservice_chat_bot.arn}/*"
+        Condition = {
+          StringEquals = {
+            "AWS:SourceArn" = aws_cloudfront_distribution.microservice_chat_bot_s3_distribution.arn
+          }
+        }
       }
     ]
   })
