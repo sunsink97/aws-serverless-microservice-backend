@@ -3,7 +3,7 @@ import os
 import urllib.request
 import urllib.error
 
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
+GROQ_API_KEY = os.environ.get("testapi")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 MODEL_NAME = os.environ.get("MODEL_NAME", "llama-3.1-8b-instant")
 
@@ -88,3 +88,4 @@ def lambda_handler(event, context):
     except Exception as e:
         print("Unhandled exception:", repr(e))
         return _response(500, {"error": "Internal server error"})
+
