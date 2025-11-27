@@ -460,7 +460,7 @@
   </div>
 
   <script>
-    const API_ENDPOINT = "https://api.yourdomain.dev/chat";
+    const API_ENDPOINT = "${api_endpoint}";
 
     const messagesEl = document.getElementById("messages");
     const inputEl = document.getElementById("input");
@@ -484,7 +484,7 @@
       const meta = document.createElement("div");
       meta.className = "message-meta";
       const label = role === "user" ? "You" : "AI";
-      meta.innerHTML = `<span>${label}</span><span class="dot"></span><span>${new Date().toLocaleTimeString()}</span>`;
+      meta.innerHTML = `<span>$${label}</span><span class="dot"></span><span>$${new Date().toLocaleTimeString()}</span>`;
 
       bubbleWrap.appendChild(bubble);
       bubbleWrap.appendChild(meta);
