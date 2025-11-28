@@ -3,13 +3,12 @@ resource "aws_apigatewayv2_api" "microservice_chat_bot_api" {
   protocol_type = "HTTP"
 
   cors_configuration {
-    allow_origins = ["*"] # or ["https://your-cloudfront-domain"]
+    allow_origins = ["*"]
     allow_methods = ["OPTIONS", "POST"]
     allow_headers = ["content-type"]
   }
 }
 
-# Integrate Lambda → API
 resource "aws_apigatewayv2_integration" "microservice_chat_bot_integration" {
   api_id                 = aws_apigatewayv2_api.microservice_chat_bot_api.id
   integration_type       = "AWS_PROXY"
@@ -17,7 +16,6 @@ resource "aws_apigatewayv2_integration" "microservice_chat_bot_integration" {
   payload_format_version = "2.0"
 }
 
-# Create /chat route
 resource "aws_apigatewayv2_route" "chat_route" {
   api_id    = aws_apigatewayv2_api.microservice_chat_bot_api.id
   route_key = "POST /chat"
@@ -25,14 +23,12 @@ resource "aws_apigatewayv2_route" "chat_route" {
 }
 
 
-# Stage for public URL
 resource "aws_apigatewayv2_stage" "dev" {
   api_id      = aws_apigatewayv2_api.microservice_chat_bot_api.id
   name        = "dev"
   auto_deploy = true
 }
 
-# Allow API Gateway to invoke Lambda
 resource "aws_lambda_permission" "api_invoke" {
   statement_id  = "AllowInvoke"
   action        = "lambda:InvokeFunction"
