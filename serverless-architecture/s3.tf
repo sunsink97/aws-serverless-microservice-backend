@@ -10,7 +10,7 @@ resource "random_id" "suffix" {
 resource "aws_s3_bucket" "microservice_chat_bot" {
   bucket = "${var.environment}-microservice-chat-bot-${random_id.suffix.hex}"
 
-  tags = merge(local.common_tags,{ 
+  tags = merge(local.common_tags, {
     description = "S3 bucket for demoo"
   })
 }

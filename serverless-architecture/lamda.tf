@@ -42,13 +42,13 @@ resource "aws_lambda_function" "microservice_chat_bot_lambda" {
     }
   }
 
-  memory_size      = var.lambda_initial_spec["memory_size"]
-  timeout          = var.lambda_initial_spec["timeout"]
+  memory_size = var.lambda_initial_spec["memory_size"]
+  timeout     = var.lambda_initial_spec["timeout"]
   ephemeral_storage {
     size = var.lambda_initial_spec["ephemeral_storage"]["size"]
   }
 
-    tags = merge(local.common_tags,{ 
+  tags = merge(local.common_tags, {
     description = "sending user prompt to groq ai"
   })
 }

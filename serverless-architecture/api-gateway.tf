@@ -8,7 +8,7 @@ resource "aws_apigatewayv2_api" "microservice_chat_bot_api" {
     allow_headers = ["content-type"]
   }
 
-    tags = merge(local.common_tags,{ 
+  tags = merge(local.common_tags, {
     description = "api gateway to send request to backend lambda"
   })
 }
