@@ -39,7 +39,6 @@ resource "aws_cloudfront_distribution" "microservice_chat_bot_s3_distribution" {
     max_ttl                = 86400
   }
 
-  # Cache behavior with precedence 0
   ordered_cache_behavior {
     path_pattern     = "/content/immutable/*"
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
@@ -62,7 +61,6 @@ resource "aws_cloudfront_distribution" "microservice_chat_bot_s3_distribution" {
     viewer_protocol_policy = "redirect-to-https"
   }
 
-  # Cache behavior with precedence 1
   ordered_cache_behavior {
     path_pattern     = "/content/*"
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
@@ -84,16 +82,16 @@ resource "aws_cloudfront_distribution" "microservice_chat_bot_s3_distribution" {
     viewer_protocol_policy = "redirect-to-https"
   }
 
+
+  tags = local.common_tags
+
+
   price_class = "PriceClass_200"
 
   restrictions {
     geo_restriction {
       restriction_type = "none"
     }
-  }
-
-  tags = {
-    Environment = "${var.environment}"
   }
 
   viewer_certificate {
