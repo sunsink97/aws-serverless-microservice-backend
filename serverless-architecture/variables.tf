@@ -22,16 +22,16 @@ variable "groq_api" {
 
 variable "lambda_initial_spec" {
   type = object({
-    memory_size      = number
-    timeout          = number
+    memory_size = number
+    timeout     = number
     ephemeral_storage = object({
       size = number
     })
   })
 
   default = {
-    memory_size      = 512
-    timeout          = 10
+    memory_size = 512
+    timeout     = 10
     ephemeral_storage = {
       size = 512
     }
