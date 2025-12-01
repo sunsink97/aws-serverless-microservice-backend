@@ -37,8 +37,8 @@ resource "aws_lambda_function" "microservice_chat_bot_lambda" {
   runtime = var.python_version
   environment {
     variables = {
-      ENVIRONMENT = var.environment
-      LOG_LEVEL   = "info"
+      environment = var.environment
+      testapi     = var.groq_api
     }
   }
 

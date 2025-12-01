@@ -3,7 +3,7 @@ locals {
 }
 
 resource "aws_cloudfront_origin_access_control" "microservice_chat_bot_oac" {
-  name                              = "default-oac"
+  name                              = "microservice_chat_bot_oac"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
@@ -18,7 +18,7 @@ resource "aws_cloudfront_distribution" "microservice_chat_bot_s3_distribution" {
 
   enabled             = true
   is_ipv6_enabled     = true
-  comment             = "Some comment"
+  comment             = "cloudfront oac for serverless project"
   default_root_object = "index.html"
 
   default_cache_behavior {

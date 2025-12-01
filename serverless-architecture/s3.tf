@@ -64,9 +64,8 @@ resource "aws_s3_bucket_policy" "bucket_policy_microservice_chat_bot" {
 }
 
 resource "aws_s3_object" "microservice_chat_bot_index" {
-  bucket = aws_s3_bucket.microservice_chat_bot.id
-  key    = "index.html"
-
+  bucket       = aws_s3_bucket.microservice_chat_bot.id
+  key          = "index.html"
   content_type = "text/html"
 
   content = templatefile("${path.module}/Files/index.template.html", {

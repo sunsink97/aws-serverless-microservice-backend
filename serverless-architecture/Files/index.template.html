@@ -1,586 +1,219 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>AI Chat Demo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<title>AI Chat Demo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    :root {
-      --bg: #020617;
-      --bg-elevated: #020818;
-      --accent: #4f46e5;
-      --accent-soft: rgba(79, 70, 229, 0.12);
-      --accent-soft-2: rgba(79, 70, 229, 0.08);
-      --border-subtle: rgba(148, 163, 184, 0.35);
-      --text-main: #e5e7eb;
-      --text-soft: #9ca3af;
-      --bubble-user: #4f46e5;
-      --bubble-ai: #0b1220;
-      --danger: #ef4444;
-    }
+<style>
+  :root{
+    --bg:#050505;
+    --panel:#0d0d0d;
+    --accent:#4f46e5;
+    --user:#4f46e5;
+    --ai:#111827;
+    --text:#e5e7eb;
+    --text-soft:#9ca3af;
+    --border:rgba(148,163,184,0.3);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+  body{
+    background:var(--bg);
+    color:var(--text);
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:10px;
+  }
 
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #020617 0, #020617 35%, #000 100%);
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
+  .app{
+    width:100%;
+    max-width:600px;
+    height:80vh;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:16px;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
 
-    .app {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      max-width: 600px;     
-      min-height: 80vh;
-      margin: 0 auto;
-      background: radial-gradient(circle at top left, #020617, #020617 40%, #020617 100%);
-      border-radius: 18px;
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      box-shadow:
-        0 24px 80px rgba(15, 23, 42, 0.9),
-        0 0 0 1px rgba(15, 23, 42, 0.9);
-      overflow: hidden;
-    }
+  header{
+    padding:14px 18px;
+    font-size:16px;
+    font-weight:600;
+    border-bottom:1px solid var(--border);
+    background:#0b0b0b;
+  }
 
-    .app-header {
-      padding: 14px 18px;
-      border-bottom: 1px solid rgba(31, 41, 55, 0.9);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      background: radial-gradient(circle at top left, #020617, #020617 60%, #020617 100%);
-    }
+  .chat{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+  }
 
-    .app-title-wrap {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+  .chat-messages{
+    flex:1;
+    padding:16px;
+    overflow-y:auto;
+  }
 
-    .logo {
-      width: 32px;
-      height: 32px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 30% 30%, #818cf8, #4f46e5 40%, #1d2335 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      font-weight: 700;
-      color: #e5e7eb;
-      box-shadow: 0 10px 22px rgba(79, 70, 229, 0.6);
-    }
+  .chat-message{
+    display:flex;
+    gap:10px;
+    margin-bottom:12px;
+    max-width:75%;
+  }
 
-    .app-title-text {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
+  .chat-message.ai{justify-content:flex-start}
+  .chat-message.user{justify-content:flex-end;margin-left:auto}
 
-    .app-title {
-      font-size: 15px;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      color: #f9fafb;
-    }
+  .avatar{
+    width:26px;height:26px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;justify-content:center;
+    font-size:13px;font-weight:600;color:white;
+  }
 
-    .app-subtitle {
-      font-size: 12px;
-      color: var(--text-soft);
-    }
+  .avatar.ai{background:#16a34a}
+  .avatar.user{background:#0ea5e9}
 
-    .badge-lite {
-      font-size: 11px;
-      padding: 4px 9px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      color: var(--text-soft);
-      background: rgba(15, 23, 42, 0.9);
-      white-space: nowrap;
-    }
+  .bubble{
+    padding:10px 14px;
+    border-radius:14px;
+    white-space:pre-wrap;
+    word-break:break-word;
+    font-size:14px;
+  }
 
-    .chat {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      background: radial-gradient(circle at top, #020617 0, #020617 30%, #020617 100%);
-    }
+  .ai .bubble{
+    background:var(--ai);
+    border:1px solid #1f2937;
+  }
 
-    .chat-messages {
-      flex: 1;
-      padding: 16px 16px 8px;
-      overflow-y: auto;
-      scroll-behavior: smooth;
-    }
+  .user .bubble{
+    background:var(--user);
+    color:white;
+  }
 
-    .chat-message {
-      max-width: 75%;
-      margin-bottom: 10px;
-      display: flex;
-      gap: 8px;
-    }
+  #typingIndicator{
+    display:none;
+    padding:0 16px 8px;
+    font-size:12px;
+    color:var(--text-soft);
+  }
 
-    .chat-message.ai {
-      justify-content: flex-start;
-    }
+  .typing-dot{
+    width:6px;height:6px;
+    border-radius:50%;
+    background:var(--text-soft);
+    display:inline-block;
+    animation:pulse 1s infinite ease-in-out;
+    margin-right:4px;
+  }
+  .typing-dot:nth-child(2){animation-delay:.15s}
+  .typing-dot:nth-child(3){animation-delay:.3s}
 
-    .chat-message.user {
-      justify-content: flex-end;
-      margin-left: auto;
-    }
+  /* input bar simplified */
+  .chat-input-bar{
+    padding:10px;
+    border-top:1px solid var(--border);
+    display:flex;
+    gap:8px;
+    background:#0b0b0b;
+  }
 
-    .avatar {
-      width: 26px;
-      height: 26px;
-      border-radius: 999px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 600;
-    }
+  textarea{
+    flex:1;background:#000;border:none;outline:none;
+    color:white;font-size:14px;
+    padding:8px;border-radius:10px;
+    resize:none;height:38px;
+  }
 
-    .avatar.ai {
-      background: radial-gradient(circle at 30% 30%, #22c55e, #16a34a 40%, #064e3b 100%);
-      color: #ecfdf3;
-    }
+  button{
+    background:var(--accent);
+    border:none;color:white;
+    padding:0 16px;font-weight:500;
+    border-radius:10px;
+    cursor:pointer;
+    display:flex;align-items:center;
+  }
 
-    .avatar.user {
-      background: radial-gradient(circle at 30% 30%, #38bdf8, #0ea5e9 40%, #0f172a 100%);
-      color: #e0f2fe;
-    }
-
-    .bubble {
-      border-radius: 16px;
-      padding: 9px 11px;
-      font-size: 14px;
-      line-height: 1.45;
-      border: 1px solid transparent;
-      backdrop-filter: blur(10px);
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
-
-    .ai .bubble {
-      background: var(--bubble-ai);
-      border-color: rgba(31, 41, 55, 0.9);
-      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.75);
-    }
-
-    .user .bubble {
-      background: var(--bubble-user);
-      color: #eef2ff;
-      border-color: rgba(129, 140, 248, 0.6);
-      box-shadow: 0 10px 24px rgba(79, 70, 229, 0.7);
-    }
-
-    .message-meta {
-      font-size: 11px;
-      color: var(--text-soft);
-      margin-top: 3px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .dot {
-      width: 4px;
-      height: 4px;
-      border-radius: 999px;
-      background: rgba(148, 163, 184, 0.65);
-    }
-
-    .typing-indicator {
-      display: none;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      color: var(--text-soft);
-      padding: 0 16px 8px;
-    }
-
-    .typing-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: rgba(148, 163, 184, 0.7);
-      animation: pulse 1s infinite ease-in-out;
-    }
-
-    .typing-dot:nth-child(2) {
-      animation-delay: 0.15s;
-    }
-
-    .typing-dot:nth-child(3) {
-      animation-delay: 0.3s;
-    }
-
-    @keyframes pulse {
-      0%, 100% {
-        opacity: 0.3;
-        transform: translateY(0);
-      }
-      50% {
-        opacity: 1;
-        transform: translateY(-2px);
-      }
-    }
-
-    .chat-input-bar {
-      padding: 10px 12px;
-      border-top: 1px solid rgba(31, 41, 55, 0.85);
-      background: linear-gradient(to bottom, #020617, #020617 60%, #000 100%);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .input-row {
-      display: flex;
-      gap: 8px;
-      align-items: flex-end;
-    }
-
-    .input-wrapper {
-      flex: 1;
-      position: relative;
-      border-radius: 999px;
-      border: 1px solid var(--border-subtle);
-      background: rgba(15, 23, 42, 0.9);
-      display: flex;
-      align-items: center;
-      padding: 2px 12px;
-    }
-
-    .input-wrapper:focus-within {
-      border-color: rgba(129, 140, 248, 0.9);
-      box-shadow: 0 0 0 1px rgba(129, 140, 248, 0.45);
-    }
-
-    textarea {
-      flex: 1;
-      border: none;
-      outline: none;
-      resize: none;
-      font-family: inherit;
-      font-size: 14px;
-      line-height: 1.4;
-      padding: 6px 0;
-      background: transparent;
-      color: var(--text-main);
-      max-height: 88px;
-    }
-
-    textarea::placeholder {
-      color: rgba(148, 163, 184, 0.9);
-    }
-
-    .send-btn {
-      border-radius: 999px;
-      padding: 7px 16px;
-      border: none;
-      background: linear-gradient(135deg, #4f46e5, #6366f1);
-      color: #f9fafb;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 12px 26px rgba(79, 70, 229, 0.7);
-      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
-      white-space: nowrap;
-    }
-
-    .send-btn:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 16px 30px rgba(79, 70, 229, 0.8);
-      background: linear-gradient(135deg, #4f46e5, #818cf8);
-    }
-
-    .send-btn:disabled {
-      opacity: 0.6;
-      cursor: default;
-      box-shadow: none;
-    }
-
-    .send-icon {
-      font-size: 14px;
-    }
-
-    .input-hint-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 11px;
-      color: var(--text-soft);
-      padding: 0 4px 2px;
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      margin-right: 6px;
-      background: #22c55e;
-      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.25);
-    }
-
-    .status {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .error-banner {
-      display: none;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      padding: 7px 10px;
-      border-radius: 10px;
-      border: 1px solid rgba(239, 68, 68, 0.7);
-      background: rgba(127, 29, 29, 0.7);
-      color: #fee2e2;
-    }
-
-    .error-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: var(--danger);
-    }
-
-    @media (max-width: 600px) {
-      .app {
-        border-radius: 12px;
-        min-height: 90vh;
-      }
-
-      .chat-message {
-        max-width: 90%;
-      }
-
-      .app-header {
-        padding: 10px 12px;
-      }
-
-      .chat-messages {
-        padding: 12px 10px 6px;
-      }
-
-      .chat-input-bar {
-        padding: 8px 8px 8px;
-      }
-
-      .input-hint-row {
-        padding-inline: 2px;
-      }
-    }
-  </style>
+  button:hover{opacity:.85}
+</style>
 </head>
+
 <body>
-  <div class="app">
-    <header class="app-header">
-      <div class="app-title-wrap">
-        <div class="logo">AI</div>
-        <div class="app-title-text">
-          <div class="app-title">AI Chat Demo</div>
-          <div class="app-subtitle">Serverless AWS • Terraform • Personal portfolio</div>
-        </div>
-      </div>
-      <div class="badge-lite">Prototype</div>
-    </header>
+<div class="app">
+  <header>AI Chat Demo</header>
 
-    <section class="chat">
-      <div id="messages" class="chat-messages">
-        <div class="chat-message ai">
-          <div class="avatar ai">A</div>
-          <div>
-            <div class="bubble">
-              Hi! I’m a small AI demo running on AWS.
-              Ask me anything to test the pipeline.
-            </div>
-            <div class="message-meta">
-              <span>AI</span><span class="dot"></span><span>ready</span>
-            </div>
-          </div>
-        </div>
-      </div>
+  <section class="chat">
+    <div id="messages" class="chat-messages"></div>
 
-      <div id="typingIndicator" class="typing-indicator">
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
-        <span>AI is thinking…</span>
-      </div>
+    <div id="typingIndicator">
+      <span class="typing-dot"></span>
+      <span class="typing-dot"></span>
+      <span class="typing-dot"></span>
+      <span>AI is thinking…</span>
+    </div>
 
-      <div class="chat-input-bar">
-        <div id="errorBanner" class="error-banner">
-          <span class="error-dot"></span>
-          <span>Something went wrong talking to the backend. Please try again.</span>
-        </div>
+    <div class="chat-input-bar">
+      <textarea id="input" placeholder="Type message..."></textarea>
+      <button id="sendBtn">Send</button>
+    </div>
+  </section>
+</div>
 
-        <div class="input-row">
-          <div class="input-wrapper">
-            <textarea
-              id="input"
-              rows="1"
-              placeholder="Type a message (/clear to reset) and press Enter…"
-            ></textarea>
-          </div>
-          <button id="sendBtn" class="send-btn">
-            <span class="send-icon">➤</span>
-            <span>Send</span>
-          </button>
-        </div>
+<script>
+const API_ENDPOINT="${api_endpoint}";
+const messagesEl=document.getElementById("messages");
+const inputEl=document.getElementById("input");
+const sendBtn=document.getElementById("sendBtn");
+const typingEl=document.getElementById("typingIndicator");
 
-        <div class="input-hint-row">
-          <div class="status">
-            <span class="status-dot"></span>
-            <span>Live demo • requests logged for metrics</span>
-          </div>
-          <span>Enter to send • Shift+Enter for new line</span>
-        </div>
-      </div>
-    </section>
-  </div>
+append("ai","Start typing anything to initate AI.");
 
-  <script>
-    const API_ENDPOINT = "${api_endpoint}";
+function append(role,text){
+  const wrap=document.createElement("div");
+  wrap.className="chat-message "+role;
+  const avatar=document.createElement("div");
+  avatar.className="avatar "+role;
+  avatar.textContent=role==="user"?"U":"A";
+  const bubble=document.createElement("div");
+  bubble.className="bubble";
+  bubble.textContent=text;
+  if(role==="user"){wrap.appendChild(bubble)}
+  else{wrap.appendChild(avatar);wrap.appendChild(bubble)}
+  messagesEl.appendChild(wrap);
+  messagesEl.scrollTop=messagesEl.scrollHeight;
+}
 
-    const messagesEl = document.getElementById("messages");
-    const inputEl = document.getElementById("input");
-    const sendBtn = document.getElementById("sendBtn");
-    const typingEl = document.getElementById("typingIndicator");
-    const errorBanner = document.getElementById("errorBanner");
+function setLoading(v){
+  typingEl.style.display=v?"block":"none";
+  sendBtn.disabled=v;
+  inputEl.disabled=v;
+}
 
-    function appendMessage(role, text) {
-      const wrapper = document.createElement("div");
-      wrapper.className = "chat-message " + (role === "user" ? "user" : "ai");
+async function sendMessage(){
+  const text=inputEl.value.trim();
+  if(!text)return;
+  if(text.toLowerCase()==="/clear"){messagesEl.innerHTML="";append("ai","Chat reset.");inputEl.value="";return}
+  append("user",text);inputEl.value="";
+  setLoading(true);
+  try{
+    const r=await fetch(API_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:text})});
+    const d=await r.json();
+    append("ai",d.reply||"[No response]");
+  }catch{append("ai","Error contacting server")}
+  setLoading(false);
+  inputEl.focus();
+}
 
-      const avatar = document.createElement("div");
-      avatar.className = "avatar " + (role === "user" ? "user" : "ai");
-      avatar.textContent = role === "user" ? "U" : "A";
-
-      const bubbleWrap = document.createElement("div");
-      const bubble = document.createElement("div");
-      bubble.className = "bubble";
-      bubble.textContent = text;
-
-      const meta = document.createElement("div");
-      meta.className = "message-meta";
-      const label = role === "user" ? "You" : "AI";
-      meta.innerHTML = `<span>$${label}</span><span class="dot"></span><span>$${new Date().toLocaleTimeString()}</span>`;
-
-      bubbleWrap.appendChild(bubble);
-      bubbleWrap.appendChild(meta);
-
-      if (role === "user") {
-        wrapper.appendChild(bubbleWrap);
-      } else {
-        wrapper.appendChild(avatar);
-        wrapper.appendChild(bubbleWrap);
-      }
-
-      messagesEl.appendChild(wrapper);
-      messagesEl.scrollTop = messagesEl.scrollHeight;
-    }
-
-    function setLoading(isLoading) {
-      if (isLoading) {
-        typingEl.style.display = "flex";
-        sendBtn.disabled = true;
-        inputEl.disabled = true;
-      } else {
-        typingEl.style.display = "none";
-        sendBtn.disabled = false;
-        inputEl.disabled = false;
-      }
-    }
-
-    function showError(show) {
-      errorBanner.style.display = show ? "flex" : "none";
-    }
-
-    function clearChat() {
-      messagesEl.innerHTML = "";
-      appendMessage(
-        "ai",
-        "Chat cleared.\nHi! I’m a small AI demo running on AWS.\ntry asking me about the weather in a country."
-      );
-    }
-
-    async function sendMessage() {
-      const text = inputEl.value.trim();
-      if (!text) return;
-
-      if (text.toLowerCase() === "/clear") {
-        inputEl.value = "";
-        clearChat();
-        return;
-      }
-
-      showError(false);
-      appendMessage("user", text);
-      inputEl.value = "";
-      setLoading(true);
-
-      try {
-        const res = await fetch(API_ENDPOINT, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: text })
-        });
-
-        if (!res.ok) {
-          throw new Error("Non-200 from API");
-        }
-
-        const data = await res.json();
-
-        const reply = (data && data.reply) || "[No response from AI backend]";
-        appendMessage("ai", reply);
-      } catch (e) {
-        console.error("Chat error:", e);
-        showError(true);
-        appendMessage(
-          "ai",
-          "I had trouble reaching the backend just now. Please try again in a moment."
-        );
-      } finally {
-        setLoading(false);
-        inputEl.focus();
-      }
-    }
-
-    sendBtn.addEventListener("click", () => {
-      sendMessage();
-    });
-
-    inputEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-      }
-    });
-
-    window.addEventListener("load", () => {
-      inputEl.focus();
-    });
-  </script>
+sendBtn.onclick=sendMessage;
+inputEl.onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage()}};
+</script>
 </body>
 </html>
