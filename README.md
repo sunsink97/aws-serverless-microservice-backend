@@ -33,5 +33,6 @@ Once the AI returns a reply, it will then be sent back to the frontend. The appl
 
 #### Note to self
 - no custom domain, website still use cloudfront id to reach.
+- maybe use bootstrapping method to make initial s3 and dynamo db for s3 backend for storing tf state
 
 ---
