@@ -2,6 +2,7 @@ locals {
   api_endpoint = "${aws_apigatewayv2_stage.dev.invoke_url}/chat"
 }
 
+//randomizer
 resource "random_id" "suffix" {
   byte_length = 4
 }
@@ -9,11 +10,9 @@ resource "random_id" "suffix" {
 resource "aws_s3_bucket" "microservice_chat_bot" {
   bucket = "${var.environment}-microservice-chat-bot-${random_id.suffix.hex}"
 
-  tags = {
-    Name        = "demo bucket"
-    Environment = "${var.environment}"
-    description = "S3 Bucket for website hosting"
-  }
+  tags = merge(local.common_tags, {
+    description = "S3 bucket for demoo"
+  })
 }
 
 resource "aws_s3_bucket_website_configuration" "microservice_chat_bot_hosting_configuration" {
