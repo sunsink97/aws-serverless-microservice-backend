@@ -1,8 +1,3 @@
-variable "scale_target_cpu" {
-  type    = number
-  default = 50
-}
-
 resource "aws_launch_template" "resilience_architecture_launch_template" {
   name                    = "${var.env}-${var.project_name}-launch-template"
   description             = "The template of EC2 for autoscale"
