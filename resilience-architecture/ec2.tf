@@ -41,7 +41,9 @@ resource "aws_launch_template" "resilience_architecture_launch_template" {
     enabled = true
   }
 
-  tags = local.common_tags
+  tags = merge(local.common_tags, {
+    Name = "${var.env}-${var.project_name}-launch-template"
+  })
 }
 
 resource "aws_autoscaling_group" "resilience_architecture_autoscaling_group" {
@@ -82,6 +84,12 @@ resource "aws_autoscaling_group" "resilience_architecture_autoscaling_group" {
     value               = "Terraform"
     propagate_at_launch = true
   }
+
+  tag {
+    key                 = "Name"
+    value               = "${var.env}-${var.project_name}-autoscaling-group"
+    propagate_at_launch = true
+  }
 }
 
 resource "aws_autoscaling_policy" "resilience_architecture_target_tracking_cpu" {
@@ -102,7 +110,6 @@ resource "aws_lb_target_group" "resilience_architecture_app_target_group" {
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = aws_vpc.resilience_architecture_vpc.id
-  tags                 = local.common_tags
   deregistration_delay = 60
 
   health_check {
@@ -115,6 +122,10 @@ resource "aws_lb_target_group" "resilience_architecture_app_target_group" {
     protocol          = "HTTP"
     timeout           = 5
   }
+
+  tags = merge(local.common_tags, {
+    Name = "${var.env}-${var.project_name}-target-group-app"
+  })
 }
 
 resource "aws_lb_listener_rule" "resilience_architecture_app_listener_rule" {
@@ -144,7 +155,10 @@ resource "aws_lb" "resilience_architecture_app_lb" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.resilience_architecture_lb_sg.id]
   subnets            = values(aws_subnet.public_subnet)[*].id
-  tags               = local.common_tags
+
+  tags = merge(local.common_tags, {
+    Name = "${var.env}-${var.project_name}-alb"
+  })
 }
 
 resource "aws_lb_listener" "resilience_architecture_http_listener" {
@@ -220,6 +234,10 @@ resource "aws_security_group" "resilience_architecture_lb_sg" {
 resource "aws_iam_instance_profile" "resilience_architecture_ec2_instance_profile" {
   name = "${var.env}-${var.project_name}-ec2-instance-profile"
   role = aws_iam_role.resilience_architecture_ec2_role.name
+
+  tags = merge(local.common_tags, {
+    Name = "${var.env}-${var.project_name}-ec2-instance-profile"
+  })
 }
 
 resource "aws_iam_role" "resilience_architecture_ec2_role" {
@@ -234,6 +252,10 @@ resource "aws_iam_role" "resilience_architecture_ec2_role" {
         Service = "ec2.amazonaws.com"
       }
     }]
+  })
+
+  tags = merge(local.common_tags, {
+    Name = "${var.env}-${var.project_name}-ec2-iam-role"
   })
 }
 
