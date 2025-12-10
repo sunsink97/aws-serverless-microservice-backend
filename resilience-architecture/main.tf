@@ -59,7 +59,7 @@ resource "aws_iam_role_policy_attachment" "lambda_dynamodb_counter_attach" {
 
 data "archive_file" "resilience_lambda_zip" {
   type        = "zip"
-  source_file = "${path.module}/lambda/resilience_function.py"  
+  source_file = "${path.module}/lambda/resilience_function.py"
   output_path = "${path.module}/lambda/resilience_lambda.zip"
 }
 
