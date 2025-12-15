@@ -52,3 +52,6 @@ ami-093a7f5fbae13ff67 <----- this ami is singapore region only
 
 
 -change storage location for the function for resilience to be inside the module instead the lambda folder. this change is done to make the code easier
+
+
+-adding sqs. just for demo purporses as there will be no real use in this project since it will only receice once or twice trigger as this is only used for dedmo
