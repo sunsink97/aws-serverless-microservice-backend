@@ -1,21 +1,22 @@
-#############################
 # Terraform
-#############################
 .terraform/
 *.tfstate
-*.tfstate.backup
-crash.log
+*.tfstate.*
+.terraform.lock.hcl
+
+# Local overrides
 override.tf
 override.tf.json
+*_override.tf
+*_override.tf.json
 
-# If you ever use tfvars for secrets (API keys, passwords, etc.)
+# Variables (keep example files instead)
 *.tfvars
+*.tfvars.json
 
-#############################
-# OS / Editor junk
-#############################
+# Archives / build artifacts
+lambda/*.zip
+
+# OS / editor
 .DS_Store
-Thumbs.db
 .vscode/
-.idea/
-*.swp

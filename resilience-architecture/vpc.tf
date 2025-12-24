@@ -37,7 +37,7 @@ resource "aws_subnet" "private_subnet" {
   vpc_id                  = aws_vpc.resilience_architecture_vpc.id
   cidr_block              = cidrsubnet(var.vpc_cidr, 4, each.key == "az1" ? 2 : 3)
   availability_zone       = each.value
-  map_public_ip_on_launch = false 
+  map_public_ip_on_launch = false
   tags = {
     Name = "${var.project_name}-private-${each.key}"
   }
